@@ -58,7 +58,7 @@ def adjust_results4_isadog(results_dic, dogfile):
                             'as-NOT-a' dog.
      dogfile - A text file that contains names of all dogs from the classifier
                function and dog names from the pet image files. This file has 
-               one dog name per line dog names are all in lowercase with 
+               one dog name per line. Dog names are all in lowercase with 
                spaces separating the distinct words of the dog name. Dog names
                from the classifier function can be a string of dog names separated
                by commas when a particular breed of dog has multiple dog names 
@@ -67,4 +67,17 @@ def adjust_results4_isadog(results_dic, dogfile):
     Returns:
            None - results_dic is mutable data type so no return needed.
     """           
-    None
+    lines = set()
+    with open(dogfile) as f:
+        for line in f:
+           lines.add(line.rstrip())
+    for result in results_dic.values():
+        if result[0] in lines:
+            result.append(1)
+        else:
+            result.append(0)
+            
+        if result[1] in lines:
+            result.append(1)
+        else:
+            result.append(0)

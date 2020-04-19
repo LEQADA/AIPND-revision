@@ -17,8 +17,10 @@
 #
 ##
 # Imports python modules
+import re
+import os
 from os import listdir
-
+from glob import glob
 # TODO 2: Define get_pet_labels function below please be certain to replace None
 #       in the return statement with results_dic dictionary that you create 
 #       with this function
@@ -40,6 +42,16 @@ def get_pet_labels(image_dir):
       List. The list contains for following item:
          index 0 = pet image label (string)
     """
+    results_dic = {}
+    fileNameRegex = r"(.*?)[_0-9]+.jpg" # dog_cat_123.jpg => dog_cat
+    imgFiles = glob("{}/*.jpg".format(image_dir))
+    
+    for imgPath in imgFiles:
+        imgName = os.path.basename(imgPath)
+        parsedName = re.search(fileNameRegex, imgName)
+        label = parsedName.group(1).replace('_', ' ').lower()
+        results_dic[imgName] = [label]
+
     # Replace None with the results_dic dictionary that you created with this
     # function
-    return None
+    return results_dic
