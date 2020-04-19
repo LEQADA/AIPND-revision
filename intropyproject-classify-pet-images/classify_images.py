@@ -1,37 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # */AIPND-revision/intropyproject-classify-pet-images/classify_images.py
-#                                                                             
-# PROGRAMMER: 
-# DATE CREATED:                                 
-# REVISED DATE: 
-# PURPOSE: Create a function classify_images that uses the classifier function 
-#          to create the classifier labels and then compares the classifier 
-#          labels to the pet image labels. This function inputs:
-#            -The Image Folder as image_dir within classify_images and function 
-#             and as in_arg.dir for function call within main. 
-#            -The results dictionary as results_dic within classify_images 
-#             function and results for the functin call within main.
-#            -The CNN model architecture as model within classify_images function
-#             and in_arg.arch for the function call within main. 
-#           This function uses the extend function to add items to the list 
-#           that's the 'value' of the results dictionary. You will be adding the
-#           classifier label as the item at index 1 of the list and the comparison 
-#           of the pet and classifier labels as the item at index 2 of the list.
-#
 ##
-# Imports classifier function for using CNN to classify images 
-import glob
-import os
 
 from classifier import classifier 
 
-# TODO 3: Define classify_images function below, specifically replace the None
-#       below by the function definition of the classify_images function. 
-#       Notice that this function doesn't return anything because the 
-#       results_dic dictionary that is passed into the function is a mutable 
-#       data type so no return is needed.
-# 
 def classify_images(images_dir, results_dic, model):
     """
     Creates classifier labels with classifier function, compares pet labels to 
@@ -68,17 +41,30 @@ def classify_images(images_dir, results_dic, model):
      Returns:
            None - results_dic is mutable data type so no return needed.         
     """
-    imgFiles = glob.glob("{}/*.jpg".format(images_dir))
-    
-    for imgPath in imgFiles:
-        imgName = os.path.basename(imgPath)
-        classifier_labels_raw = classifier(imgPath, model)
-        classifier_labels = classifier_labels_raw.lower().split(', ')
+    # Process all files in the results_dic - use images_dir to give fullpath
+    # that indicates the folder and the filename (key) to be used in the 
+    # classifier function
+    for key in results_dic:
+       
+       #  Runs classifier function to classify the images classifier function 
+       # inputs: path + filename  and  model, returns model_label 
+       # as classifier label
+       model_label = classifier('{}/{}'.format(images_dir, key), model)
 
-        if imgName in results_dic:
-            results_dic[imgName].append(classifier_labels_raw)
-            if results_dic[imgName][0] in classifier_labels:
-                results_dic[imgName].append(1)
-            else:
-                results_dic[imgName].append(0)
-    
+       # Processes the results so they can be compared with pet image labels
+       # set labels to lowercase (lower) and stripping off whitespace(strip)
+       model_label = model_label.lower().strip()
+              
+       # defines truth as pet image label 
+       truth = results_dic[key][0]
+
+       # If the pet image label is found within the classifier label list of terms 
+       # as an exact match to on of the terms in the list - then they are added to 
+       # results_dic as an exact match(1) using extend list function
+       if truth in model_label:
+           results_dic[key].extend([model_label, 1])
+
+       # if not found then added to results dictionary as NOT a match(0) using
+       # the extend function 
+       else:
+           results_dic[key].extend([model_label, 0])
